@@ -97,11 +97,36 @@ export async function getCardData() {
   }
 }
 
-export async function getOrders(){
-  try{
-    return await prisma.order.findMany({})
-  }catch(error){
+export async function getOrders(page: number, search: string) {
+  try {
+    return await prisma.order.findMany({
+      orderBy: {
+        updatedAt: "desc",
+      },
+      skip: (page - 1) * 10,
+      take: 10,
+      where: {
+        OR: [
+          {
+            productName: {
+              contains: search,
+            },
+          },
+          {
+            status: {
+              contains: search,
+            },
+          },
+          {
+            description: {
+              contains: search,
+            },
+          },
+        ],
+      },
+    });
+  } catch (error) {
     console.log(error);
-    throw new Error("Error getting orders")
+    throw new Error("Error getting orders");
   }
 }
